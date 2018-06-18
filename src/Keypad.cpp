@@ -32,7 +32,7 @@
 #include <Keypad.h>
 
 // <<constructor>> Allows custom keymap, pin configuration, and keypad sizes.
-Keypad::Keypad(char *userKeymap, byte *row, byte *col, byte numRows, byte numCols) {
+Keypad::Keypad(char *userKeymap, int *row, int *col, byte numRows, byte numCols) {
 	rowPins = row;
 	columnPins = col;
 	sizeKpd.rows = numRows;
@@ -83,19 +83,19 @@ bool Keypad::getKeys() {
 void Keypad::scanKeys() {
 	// Re-intialize the row pins. Allows sharing these pins with other hardware.
 	for (byte r=0; r<sizeKpd.rows; r++) {
-		pin_mode(rowPins[r],INPUT_PULLUP);
+		pinMode(rowPins[r],INPUT_PULLUP);
 	}
 
 	// bitMap stores ALL the keys that are being pressed.
 	for (byte c=0; c<sizeKpd.columns; c++) {
-		pin_mode(columnPins[c],OUTPUT);
-		pin_write(columnPins[c], LOW);	// Begin column pulse output.
+		pinMode(columnPins[c],OUTPUT);
+		digitalWrite(columnPins[c], LOW);	// Begin column pulse output.
 		for (byte r=0; r<sizeKpd.rows; r++) {
-			bitWrite(bitMap[r], c, !pin_read(rowPins[r]));  // keypress is active low so invert to high.
+			bitWrite(bitMap[r], c, !digitalRead(rowPins[r]));  // keypress is active low so invert to high.
 		}
 		// Set pin to high impedance input. Effectively ends column pulse.
-		pin_write(columnPins[c],HIGH);
-		pin_mode(columnPins[c],INPUT);
+		digitalWrite(columnPins[c],HIGH);
+		pinMode(columnPins[c],INPUT);
 	}
 }
 
